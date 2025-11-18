@@ -1,16 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.global.min.js"></script>
     <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+
     <div id="app">
+
+        <!-- Componente do Bot -->
+        <bot-logic ref="bot"></bot-logic>
 
         <div class="container">
             <h1 class="tituloJogo">Jogo da Velha CPW2</h1>
@@ -18,7 +23,6 @@
             <div class="modoJogo">
                 <button @click="contraBote">Contra Bot</button>
                 <h4 v-if="contraBot === true">: ON</h4>
-
             </div>
 
             <div class="modoJogo">
@@ -29,171 +33,134 @@
             <div class="vencedor">
                 <h2>Vez do jogador: {{ jogadorAtual }}</h2>
                 <br>
-
             </div>
 
             <div class="box">
-                <button class="boxe" @click="marcarCaixa(0)">{{ caixas[0].value }}</button>
-                <button class="boxe" @click="marcarCaixa(1)">{{ caixas[1].value }}</button>
-                <button class="boxe" @click="marcarCaixa(2)">{{ caixas[2].value }}</button>
-                <button class="boxe" @click="marcarCaixa(3)">{{ caixas[3].value }}</button>
-                <button class="boxe" @click="marcarCaixa(4)">{{ caixas[4].value }}</button>
-                <button class="boxe" @click="marcarCaixa(5)">{{ caixas[5].value }}</button>
-                <button class="boxe" @click="marcarCaixa(6)">{{ caixas[6].value }}</button>
-                <button class="boxe" @click="marcarCaixa(7)">{{ caixas[7].value }}</button>
-                <button class="boxe" @click="marcarCaixa(8)">{{ caixas[8].value }}</button>
+                <button class="boxe" v-for="(cx, i) in caixas" :key="i" @click="marcarCaixa(i)">
+                    {{ cx.value }}
+                </button>
             </div>
 
             <div class="resetar">
                 <button @click="resetar()">Resetar</button>
             </div>
         </div>
+    </div>
 
-        <script type="module">
+    <script type="module">
+        import BotComponent from './bot-component.js';
 
+        
 
-            const app = Vue.createApp({
-                data() {
-                    return {
-                        jogadorAtual: 'X',
-                        contraJog: true,
-                        contraBot: false,
-                        dificuldade: 'facil',
-                        caixas: [
-                            { id: 1, value: '' },
-                            { id: 2, value: '' },
-                            { id: 3, value: '' },
-                            { id: 4, value: '' },
-                            { id: 5, value: '' },
-                            { id: 6, value: '' },
-                            { id: 7, value: '' },
-                            { id: 8, value: '' },
-                            { id: 9, value: '' },
-                        ],
-                    };
+        const app = Vue.createApp({
+            data() {
+                return {
+                    jogadorAtual: 'X',
+                    contraJog: true,
+                    contraBot: false,
+                    caixas: [
+                        { id: 1, value: '' },
+                        { id: 2, value: '' },
+                        { id: 3, value: '' },
+                        { id: 4, value: '' },
+                        { id: 5, value: '' },
+                        { id: 6, value: '' },
+                        { id: 7, value: '' },
+                        { id: 8, value: '' },
+                        { id: 9, value: '' },
+                    ],
+                };
+            },
+
+            methods: {
+
+                trocarJogador() {
+                    this.jogadorAtual = this.jogadorAtual === 'X' ? 'O' : 'X';
+
+                    if (this.contraBot && this.jogadorAtual === 'O' && this.vencedor() === '') {
+                        this.$refs.bot.jogarBot(
+                            this.caixas,
+                            this.jogadorAtual,
+                            this.marcarCaixa
+                        );
+                    }
                 },
-                methods: {
-                    trocarJogador() {
-                        if (this.jogadorAtual === 'X') {
-                            this.jogadorAtual = 'O';
-                        } else if (this.jogadorAtual === 'O') {
-                            this.jogadorAtual = 'X';
-                        }
 
-                        if (this.contraBot == true && this.jogadorAtual === 'O' && this.vencedor() === '') {
-                            this.jogarBot();
-                        }
-                    },
-                    marcarCaixa(i) {
-                        if (this.caixas[i].value === '' && this.vencedor() === '') {
-                            this.caixas[i].value = this.jogadorAtual;
-                            this.trocarJogador();
-                        }
+                marcarCaixa(i) {
+                    if (this.caixas[i].value === '' && this.vencedor() === '') {
+                        this.caixas[i].value = this.jogadorAtual;
+                        this.trocarJogador();
+                    }
 
-                        let resultado = this.vencedor();
-                        if (resultado === 'X' || resultado === 'O') {
-                            setTimeout(() => {
-                                alert("Vencedor: Jogador " + resultado);
-                                this.resetar();
-                            }, 500);
-                        };
-                        if (resultado === 'empate') {
-                            setTimeout(() => {
-                                alert("Empate!");
-                                this.resetar();
-                            }, 500);
-                        }
+                    let resultado = this.vencedor();
 
-                    },
-                    resetar() {
-                        for (let i = 0; i < 9; i++) {
-                            this.caixas[i].value = '';
-                        }
-                        this.jogadorAtual = 'X';
-                    },
-
-                    vencedor() {
-                        const linhas = [
-                            [0, 1, 2],
-                            [3, 4, 5],
-                            [6, 7, 8],
-                            [0, 3, 6],
-                            [1, 4, 7],
-                            [2, 5, 8],
-                            [0, 4, 8],
-                            [2, 4, 6]
-                        ];
-                        for (let linha of linhas) {
-                            const [a, b, c] = linha;
-                            if (
-                                this.caixas[a].value &&
-                                this.caixas[a].value === this.caixas[b].value &&
-                                this.caixas[a].value === this.caixas[c].value
-                            ) {
-                                return this.caixas[a].value;
-                            }
-                        }
-                        if (this.caixas.every(caixa => caixa.value !== '')) {
-                            return 'empate';
-                        }
-                        return '';
-                    },
-
-                    contraBote() {
-                        this.contraBot = true;
-                        this.contraJog = false;
-                        this.resetar();
-                    },
-                    jogarBot() {
-                        let escolha = -1;
-                        let tentativas = 0;
-                        while (tentativas < 20) {
-                            const idx = Math.floor(Math.random() * 9);
-                            if (this.caixas[idx].value === '') {
-                                escolha = idx;
-                                break;
-                            }
-                            tentativas++;
-                        }
-
-                        if (escolha === -1) {
-                            for (let i = 0; i < 9; i++) {
-                                if (this.caixas[i].value === '') {
-                                    escolha = i;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (escolha === -1) return;
-
-
+                    if (resultado === 'X' || resultado === 'O') {
                         setTimeout(() => {
-                            if (this.jogadorAtual === 'O' && this.caixas[escolha].value === '') {
-                                this.marcarCaixa(escolha);
-                            }
-                        }, 200);
-                    },
+                            alert("Vencedor: Jogador " + resultado);
+                            this.resetar();
+                        }, 400);
+                    }
 
-                    contraPlayer() {
-                        this.contraBot = false;
-                        this.contraJog = true;
-                        this.resetar();
-                    },
+                    if (resultado === 'empate') {
+                        setTimeout(() => {
+                            alert("Empate!");
+                            this.resetar();
+                        }, 400);
+                    }
+                },
 
-                    dificuldadeFacil() {
-                        this.dificuldade = 'facil';
-                        this.resetar();
-                    },
-                    dificuldadeMedio() {
-                        this.dificuldade = 'medio';
-                        this.resetar();
-                    }   
+                resetar() {
+                    this.caixas.forEach(c => c.value = '');
+                    this.jogadorAtual = 'X';
+                },
 
+                vencedor() {
+                    const linhas = [
+                        [0, 1, 2],
+                        [3, 4, 5],
+                        [6, 7, 8],
+                        [0, 3, 6],
+                        [1, 4, 7],
+                        [2, 5, 8],
+                        [0, 4, 8],
+                        [2, 4, 6]
+                    ];
+
+                    for (let linha of linhas) {
+                        const [a, b, c] = linha;
+
+                        if (
+                            this.caixas[a].value &&
+                            this.caixas[a].value === this.caixas[b].value &&
+                            this.caixas[a].value === this.caixas[c].value
+                        ) {
+                            return this.caixas[a].value;
+                        }
+                    }
+
+                    if (this.caixas.every(c => c.value !== '')) return 'empate';
+
+                    return '';
+                },
+
+                contraBote() {
+                    this.contraBot = true;
+                    this.contraJog = false;
+                    this.resetar();
+                },
+
+                contraPlayer() {
+                    this.contraBot = false;
+                    this.contraJog = true;
+                    this.resetar();
                 }
-            });
-            app.mount("#app");
-        </script>
+            }
+        });
+
+        app.component("bot-logic", BotComponent);
+        app.mount("#app");
+    </script>
+
 </body>
 
 </html>
