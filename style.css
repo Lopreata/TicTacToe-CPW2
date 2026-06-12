@@ -1,0 +1,68 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: cursive;
+    font-size: 50px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: black;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(to left, #434343, #121212);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.box {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+    font-size: 50px;
+    
+    border-radius: 10px;
+}
+
+.resetar {
+    display: flex;
+    justify-content: left;
+    margin-top: 20px;
+}
+
+.vencedor {
+    justify-content: center;
+    margin-top: 20px;
+    color: white;
+}
+
+.tituloJogo{
+    text-align: center;
+    color: white;
+}
+
+.modoJogo{
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    margin-top: 10px;
+    gap: 10px;
+    color: white;
+}
+
+.boxe {
+    width: auto;
+    height: auto;
+    font-size: 50px;
+    border-radius: 20px;
+    background-color: #ffffff;
+    border: solid 2px #000000;
+    cursor: pointer;
+}
